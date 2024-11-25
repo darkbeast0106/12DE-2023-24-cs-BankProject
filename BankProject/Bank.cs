@@ -69,37 +69,71 @@
         /// <exception cref="ArgumentException">A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
         /// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
         public ulong Egyenleg(string szamlaszam)
+		{
+			Szamla szamla = SzamlaKereses(szamlaszam);
+
+			return szamla.Egyenleg;
+		}
+
+		/// <summary>
+		/// Egy létező számlára pénzt helyez
+		/// </summary>
+		/// <param name="szamlaszam">A számla számlaszáma, amire pénzt helyez</param>
+		/// <param name="osszeg">A számlára helyezendő pénzösszeg</param>
+		/// <exception cref="ArgumentNullException">A számlaszám nem lehet null</exception>
+		/// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
+		/// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
+		/// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
+		public void EgyenlegFeltolt(string szamlaszam, ulong osszeg)
         {
-            return 0;
+            if (osszeg == 0)
+            {
+                throw new ArgumentException("Az összeg csak pozitív egész szám lehet", nameof(osszeg));
+            }
+
+			Szamla szamla = SzamlaKereses(szamlaszam);
+
+			szamla.Egyenleg += osszeg;
         }
 
-        /// <summary>
-        /// Egy létező számlára pénzt helyez
-        /// </summary>
-        /// <param name="szamlaszam">A számla számlaszáma, amire pénzt helyez</param>
-        /// <param name="osszeg">A számlára helyezendő pénzösszeg</param>
-        /// <exception cref="ArgumentNullException">A számlaszám nem lehet null</exception>
-        /// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
-        /// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
-        /// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
-        public void EgyenlegFeltolt(string szamlaszam, ulong osszeg)
-        {
-            throw new NotImplementedException();
-        }
+		private Szamla SzamlaKereses(string szamlaszam)
+		{
+			if (szamlaszam == null)
+			{
+				throw new ArgumentNullException(nameof(szamlaszam));
+			}
+			if (szamlaszam == "")
+			{
+				throw new ArgumentException("A számlaszám nem lehet üres", nameof(szamlaszam));
+			}
 
-        /// <summary>
-        /// Két számla között utal.
-        /// Ha nincs elég pénz a forrás számlán, akkor false értékkel tér vissza
-        /// </summary>
-        /// <param name="honnan">A forrás számla számlaszáma</param>
-        /// <param name="hova">A cél számla számlaszáma</param>
-        /// <param name="osszeg">Az átutalandó egyenleg</param>
-        /// <returns>Az utalás sikeressége</returns>
-        /// <exception cref="ArgumentNullException">A forrás és cél számlaszám nem lehet null</exception>
-        /// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
-        /// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
-        /// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
-        public bool Utal(string honnan, string hova, ulong osszeg)
+			int index = 0;
+			while (index < szamlak.Count && !szamlak[index].Szamlaszam.Equals(szamlaszam))
+			{
+				index++;
+			}
+			if (index == szamlak.Count)
+			{
+				throw new HibasSzamlaszamException(szamlaszam);
+			}
+
+			return szamlak[index];
+		}
+
+
+		/// <summary>
+		/// Két számla között utal.
+		/// Ha nincs elég pénz a forrás számlán, akkor false értékkel tér vissza
+		/// </summary>
+		/// <param name="honnan">A forrás számla számlaszáma</param>
+		/// <param name="hova">A cél számla számlaszáma</param>
+		/// <param name="osszeg">Az átutalandó egyenleg</param>
+		/// <returns>Az utalás sikeressége</returns>
+		/// <exception cref="ArgumentNullException">A forrás és cél számlaszám nem lehet null</exception>
+		/// <exception cref="ArgumentException">Az összeg csak pozitív lehet.
+		/// A számlaszám számot, szóközt és kötőjelet tartalmazhat</exception>
+		/// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
+		public bool Utal(string honnan, string hova, ulong osszeg)
         {
             throw new NotImplementedException();
         }
