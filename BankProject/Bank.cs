@@ -135,7 +135,24 @@
 		/// <exception cref="HibasSzamlaszamException">A megadott számlaszámmal nem létezik számla</exception>
 		public bool Utal(string honnan, string hova, ulong osszeg)
         {
-            throw new NotImplementedException();
+            if (osszeg == 0)
+			{
+				throw new ArgumentException("Az összeg csak pozitív egész szám lehet", nameof(osszeg));
+			}
+            if (honnan == hova)
+            {
+                throw new ArgumentException("A forrás és a cél számlaszám nem egyezhet meg", nameof(hova));
+            }
+            Szamla forrasSzamla = SzamlaKereses(honnan);
+            Szamla celSzamla = SzamlaKereses(hova);
+
+            if (forrasSzamla.Egyenleg >= osszeg)
+            {
+                forrasSzamla.Egyenleg -= osszeg;
+                celSzamla.Egyenleg += osszeg;
+                return true;
+            }
+            return false;
         }
     }
 }

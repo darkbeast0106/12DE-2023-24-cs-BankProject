@@ -162,5 +162,161 @@ namespace TestBankProject
 			Assert.That(bank.Egyenleg("5678"), Is.EqualTo(20000));
 			Assert.That(bank.Egyenleg("9876"), Is.EqualTo(15000));
 		}
+
+		[Test]
+		public void Utal_ErvenyesAdatokkal_SikeresUtalas()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			bool eredmeny = bank.Utal("1234", "9876", 5000);
+			Assert.That(eredmeny, Is.True);
+			Assert.That(bank.Egyenleg("1234"), Is.EqualTo(5000));
+			Assert.That(bank.Egyenleg("9876"), Is.EqualTo(20000));
+		}
+
+		[Test]
+		public void Utal_HonnanNull_ArgumentNullExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentNullException>(() => bank.Utal(null, "9876", 5000));
+		}
+
+		[Test]
+		public void Utal_HovaNull_ArgumentNullExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentNullException>(() => bank.Utal("1234", null, 5000));
+		}
+
+		[Test]
+		public void Utal_HonnanUres_ArgumentExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentException>(() => bank.Utal("", "9876", 5000));
+		}
+
+		[Test]
+		public void Utal_HovaUres_ArgumentExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentException>(() => bank.Utal("1234", "", 5000));
+		}
+
+		[Test]
+		public void Utal_HonnanNemLetezik_HibasSzamlaszamExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<HibasSzamlaszamException>(() => bank.Utal("2468", "9876", 5000));
+		}
+
+		[Test]
+		public void Utal_HovaNemLetezik_HibasSzamlaszamExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<HibasSzamlaszamException>(() => bank.Utal("1234", "2468", 5000));
+		}
+
+		[Test]
+		public void Utal_0Osszeg_ArgumentExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentException>(() => bank.Utal("1234", "9876", 0));
+		}
+
+		[Test]
+		public void Utal_HonnanEsHovaMegegyezik_ArgumentExceptiontDob()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			Assert.Throws<ArgumentException>(() => bank.Utal("1234", "1234", 5000));
+		}
+
+		[Test]
+		public void Utal_SzamlanLevoTeljesOsszeg_SikeresUtalas()
+		{
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			bool eredmeny = bank.Utal("1234", "9876", 10000);
+			Assert.That(eredmeny, Is.True);
+			Assert.That(bank.Egyenleg("1234"), Is.EqualTo(0));
+			Assert.That(bank.Egyenleg("9876"), Is.EqualTo(25000));
+		}
+
+		[Test]
+		public void Utal_NagyobbOsszeggMintAmiASzamlanVan_SikertelenUtalasEgyenlegekNemValtoznak()
+		{
+			// Arrange
+			bank.UjSzamla("Gipsz Jakab", "1234");
+			bank.UjSzamla("Gipsz Jakab", "5678");
+			bank.UjSzamla("Teszt Elek", "9876");
+			bank.EgyenlegFeltolt("1234", 10000);
+			bank.EgyenlegFeltolt("5678", 20000);
+			bank.EgyenlegFeltolt("9876", 15000);
+
+			// Act
+			bool eredmeny = bank.Utal("1234", "9876", 10001);
+
+			// Assert
+			Assert.That(eredmeny, Is.False);
+			Assert.That(bank.Egyenleg("1234"), Is.EqualTo(10000));
+			Assert.That(bank.Egyenleg("9876"), Is.EqualTo(15000));
+		}
 	}
 }
